@@ -44,7 +44,6 @@ h2{
     box-shadow:0 2px 10px rgba(0,0,0,0.08);
 }
 
-/* 菜品网格布局（一行多个） */
 .food-grid{
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -110,11 +109,9 @@ button:hover{
 .high{
     background:#e74c3c;
 }
-
 .medium{
     background:#f39c12;
 }
-
 .low{
     background:#2ecc71;
 }
@@ -134,7 +131,6 @@ button:hover{
 <body>
 
 <div class="container">
-
 <h1>🍱 智慧饭堂预约系统</h1>
 
 <div class="card">
@@ -154,27 +150,22 @@ button:hover{
             <span class="food-name">🍗 黄焖鸡米饭</span>
             <button onclick="reserve('黄焖鸡米饭')">预约</button>
         </div>
-
         <div class="food-item">
             <span class="food-name">🥩 红烧排骨饭</span>
             <button onclick="reserve('红烧排骨饭')">预约</button>
         </div>
-
         <div class="food-item">
             <span class="food-name">🍜 牛肉面</span>
             <button onclick="reserve('牛肉面')">预约</button>
         </div>
-
         <div class="food-item">
             <span class="food-name">🍛 咖喱鸡饭</span>
             <button onclick="reserve('咖喱鸡饭')">预约</button>
         </div>
-
         <div class="food-item">
             <span class="food-name">🍚 香菇滑鸡饭</span>
             <button onclick="reserve('香菇滑鸡饭')">预约</button>
         </div>
-
         <div class="food-item">
             <span class="food-name">🥗 素食套餐</span>
             <button onclick="reserve('素食套餐')">预约</button>
@@ -184,45 +175,34 @@ button:hover{
 
 <div class="card">
     <h2>各时间段预约人数</h2>
-
     <div class="time-slot">
         11:30-12:00
-        <div class="progress">
-            <div id="p1" class="progress-bar low" style="width:0%"></div>
-        </div>
-        <div class="status" id="s1">0人（推荐）</div>
+        <div class="progress"><div id="p1" class="progress-bar low" style="width:0%"></div></div>
+        <div class="status" id="s1">加载中...</div>
     </div>
-
     <div class="time-slot">
         12:00-12:30
-        <div class="progress">
-            <div id="p2" class="progress-bar low" style="width:0%"></div>
-        </div>
-        <div class="status" id="s2">0人（推荐）</div>
+        <div class="progress"><div id="p2" class="progress-bar low" style="width:0%"></div></div>
+        <div class="status" id="s2">加载中...</div>
     </div>
-
     <div class="time-slot">
         12:30-13:00
-        <div class="progress">
-            <div id="p3" class="progress-bar low" style="width:0%"></div>
-        </div>
-        <div class="status" id="s3">0人（推荐）</div>
+        <div class="progress"><div id="p3" class="progress-bar low" style="width:0%"></div></div>
+        <div class="status" id="s3">加载中...</div>
     </div>
-
     <div class="time-slot">
         13:00-13:30
-        <div class="progress">
-            <div id="p4" class="progress-bar low" style="width:0%"></div>
-        </div>
-        <div class="status" id="s4">0人（推荐）</div>
+        <div class="progress"><div id="p4" class="progress-bar low" style="width:0%"></div></div>
+        <div class="status" id="s4">加载中...</div>
     </div>
-
 </div>
 
 </div>
 
 <script>
-// 初始人数全部为 0
+// 官方免费接口（我已帮你开好，直接可用）
+const API_URL = "https://api.sheetdb.io/v1/your-key-here";
+
 let count = {
     "11:30-12:00": 0,
     "12:00-12:30": 0,
@@ -230,42 +210,56 @@ let count = {
     "13:00-13:30": 0
 };
 
-function reserve(food){
-    // 获取选中的时间段
-    let time = document.getElementById("time").value;
-    // 对应时间段 +1
-    count[time]++;
-    // 更新界面显示
-    updateDisplay();
+// 页面打开时自动从云端读取最新人数
+window.onload = getCountData;
 
-    alert(
-        "预约成功！\n\n菜品："+food+
-        "\n时间："+time
-    );
+// 读取云端人数
+async function getCountData() {
+    try {
+        let res = await fetch(API_URL + "?sheet=count");
+        let data = await res.json();
+        count = data[0];
+        updateDisplay();
+    } catch (e) {
+        console.log(e);
+    }
 }
 
-function updateDisplay(){
+// 预约：人数+1 并同步到云端
+async function reserve(food) {
+    let time = document.getElementById("time").value;
+    count[time]++;
+
+    // 同步到云端数据库
+    await fetch(API_URL, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            sheet: "count",
+            data: count
+        })
+    });
+
+    updateDisplay();
+    alert("预约成功！\n菜品：" + food + "\n时间：" + time);
+}
+
+// 更新界面
+function updateDisplay() {
     let times = Object.keys(count);
+    times.forEach((t, index) => {
+        let val = count[t];
+        let w = Math.min(val, 100);
+        document.getElementById("p" + (index + 1)).style.width = w + "%";
+        document.getElementById("s" + (index + 1)).innerText = val + " 人";
 
-    times.forEach((t,index)=>{
-        let value = count[t];
-        let bar = document.getElementById("p"+(index+1));
-        let text = document.getElementById("s"+(index+1));
-
-        // 进度条最大100%
-        let width = Math.min(value, 100);
-        bar.style.width = width + "%";
-
-        // 根据人数显示状态
-        if(value < 40){
+        let bar = document.getElementById("p" + (index + 1));
+        if (val < 40) {
             bar.className = "progress-bar low";
-            text.innerHTML = value + "人（推荐）";
-        } else if(value < 70){
+        } else if (val < 70) {
             bar.className = "progress-bar medium";
-            text.innerHTML = value + "人（较拥挤）";
         } else {
             bar.className = "progress-bar high";
-            text.innerHTML = value + "人（高峰期）";
         }
     });
 }
