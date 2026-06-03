@@ -4,126 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>智慧饭堂预约系统</title>
-
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:"Microsoft YaHei",sans-serif;
-}
-
-body{
-    background:#f5f7fa;
-    padding:20px;
-}
-
-.container{
-    max-width:900px;
-    margin:auto;
-}
-
-h1{
-    text-align:center;
-    color:#2c3e50;
-    margin-bottom:20px;
-    font-size:24px;
-}
-
-h2{
-    font-size:18px;
-    color:#2c3e50;
-    margin-bottom:15px;
-}
-
-.card{
-    background:white;
-    border-radius:12px;
-    padding:20px;
-    margin-bottom:20px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.08);
-}
-
-.food-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-    gap:12px;
-    margin-top:10px;
-}
-
-.food-item{
-    background:#f8f9fb;
-    border-radius:10px;
-    padding:12px;
-    text-align:center;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    align-items:center;
-}
-
-.food-name{
-    font-size:14px;
-    color:#333;
-}
-
-button{
-    background:#27ae60;
-    color:white;
-    border:none;
-    padding:6px 12px;
-    border-radius:6px;
-    cursor:pointer;
-    font-size:13px;
-}
-
-button:hover{
-    background:#219150;
-}
-
-.time-select{
-    width:100%;
-    padding:10px;
-    margin-top:10px;
-    border:1px solid #ddd;
-    border-radius:6px;
-}
-
-.progress{
-    width:100%;
-    background:#e0e0e0;
-    height:18px;
-    border-radius:10px;
-    overflow:hidden;
-    margin-top:8px;
-}
-
-.progress-bar{
-    height:100%;
-    transition:width 0.3s;
-}
-
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei";}
+body{background:#f5f7fa;padding:20px;}
+.container{max-width:900px;margin:0 auto;}
+h1{text-align:center;color:#2c3e50;margin-bottom:20px;font-size:24px;}
+h2{font-size:18px;color:#2c3e50;margin-bottom:15px;}
+.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,0.08);}
+.food-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:10px;}
+.food-item{background:#f8f9fb;border-radius:10px;padding:12px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;}
+.food-name{font-size:14px;color:#333;}
+button{background:#27ae60;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;}
+button:hover{background:#219150;}
+.time-select{width:100%;padding:10px;margin-top:10px;border:1px solid #ddd;border-radius:6px;}
+.progress{width:100%;background:#e0e0e0;height:18px;border-radius:10px;overflow:hidden;margin-top:8px;}
+.progress-bar{height:100%;transition:0.3s width;}
 .low{background:#2ecc71;}
 .medium{background:#f39c12;}
 .high{background:#e74c3c;}
-
-.status{
-    margin-top:5px;
-    font-size:14px;
-    color:#666;
-}
-
-.time-slot{
-    margin-bottom:18px;
-}
+.status{margin-top:5px;font-size:14px;color:#666;}
+.time-slot{margin-bottom:18px;}
 </style>
 </head>
-
 <body>
-
 <div class="container">
 <h1>🍱 智慧饭堂预约系统</h1>
-
 <div class="card">
     <h2>选择就餐时间</h2>
     <select id="time" class="time-select">
@@ -133,41 +38,18 @@ button:hover{
         <option>13:00-13:30</option>
     </select>
 </div>
-
 <div class="card">
     <h2>今日菜品</h2>
     <div class="food-grid">
-        <div class="food-item">
-            <span class="food-name">🍗 黄焖鸡米饭</span>
-            <button onclick="reserve('黄焖鸡米饭')">预约</button>
-        </div>
-        <div class="food-item">
-            <span class="food-name">🥩 红烧排骨饭</span>
-            <button onclick="reserve('红烧排骨饭')">预约</button>
-        </div>
-        <div class="food-item">
-            <span class="food-name">🍜 牛肉面</span>
-            <button onclick="reserve('牛肉面')">预约</button>
-        </div>
-        <div class="food-item">
-            <span class="food-name">🍛 咖喱鸡饭</span>
-            <button onclick="reserve('咖喱鸡饭')">预约</button>
-        </div>
-        <div class="food-item">
-            <span class="food-name">🍚 香菇滑鸡饭</span>
-            <button onclick="reserve('香菇滑鸡饭')">预约</button>
-        </div>
-        <div class="food-item">
-            <span class="food-name">🥗 素食套餐</span>
-            <button onclick="reserve('素食套餐')">预约</button>
-        </div>
-        <div class="food-item">
-            <span class="food-name">🍢 牛肉丸粿条</span>
-            <button onclick="reserve('牛肉丸粿条')">预约</button>
-        </div>
+        <div class="food-item"><span class="food-name">🍗 黄焖鸡米饭</span><button onclick="reserve('黄焖鸡米饭')">预约</button></div>
+        <div class="food-item"><span class="food-name">🥩 红烧排骨饭</span><button onclick="reserve('红烧排骨饭')">预约</button></div>
+        <div class="food-item"><span class="food-name">🍜 牛肉面</span><button onclick="reserve('牛肉面')">预约</button></div>
+        <div class="food-item"><span class="food-name">🍛 咖喱鸡饭</span><button onclick="reserve('咖喱鸡饭')">预约</button></div>
+        <div class="food-item"><span class="food-name">🍚 香菇滑鸡饭</span><button onclick="reserve('香菇滑鸡饭')">预约</button></div>
+        <div class="food-item"><span class="food-name">🥗 素食套餐</span><button onclick="reserve('素食套餐')">预约</button></div>
+        <div class="food-item"><span class="food-name">🍢 牛肉丸粿条</span><button onclick="reserve('牛肉丸粿条')">预约</button></div>
     </div>
 </div>
-
 <div class="card">
     <h2>各时间段预约人数</h2>
     <div class="time-slot">
@@ -191,81 +73,55 @@ button:hover{
         <div class="status" id="s4">加载中...</div>
     </div>
 </div>
-
 </div>
 
-<script src="https://web-sdk-1253687890.cos.ap-beijing.myqcloud.com/cloudbase.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@1.7.1/dist/cloudbase.full.js"></script>
 <script>
-const app = cloudbase.init({
-    env: "jiege-d1grl5fwcdb75e719"
-});
+const app = cloudbase.init({env:"jiege-d1grl5fwcdb75e719"});
+let count = {};
 
-let count = {
-    "11:30-12:00": 0,
-    "12:00-12:30": 0,
-    "12:30-13:00": 0,
-    "13:00-13:30": 0
-};
-
-window.onload = async function () {
-    try {
-        await app.auth().anonymousAuthProvider().signIn();
-        loadData();
-    } catch (e) {
-        console.log("加载失败", e);
-    }
-};
-
-async function loadData() {
-    const db = app.database();
-    const coll = db.collection("reserve_count");
-    const res = await coll.doc("main").get();
-
-    if (res.data) {
-        count = res.data;
-    } else {
-        await coll.doc("main").set(count);
-    }
-    updateDisplay();
+window.onload = async function(){
+    await app.auth().anonymousAuthProvider().signIn();
+    await loadData();
 }
 
-async function reserve(food) {
-    const time = document.getElementById("time").value;
-    count[time]++;
-
-    const db = app.database();
-    await db.collection("reserve_count").doc("main").update(count);
-    
-    updateDisplay();
-    alert("预约成功！\n菜品：" + food + "\n时间：" + time);
+// 读取数据
+async function loadData(){
+    let res = await app.callFunction({
+        name:"operateCount",
+        data:{action:"get"}
+    })
+    count = res.result.data;
+    renderPage();
 }
 
-function updateDisplay() {
-    const slots = [
-        "11:30-12:00",
-        "12:00-12:30",
-        "12:30-13:00",
-        "13:00-13:30"
-    ];
+// 预约提交
+async function reserve(foodName){
+    let selectTime = document.getElementById("time").value;
+    let res = await app.callFunction({
+        name:"operateCount",
+        data:{action:"add",timeKey:selectTime}
+    })
+    if(res.result.code===0){
+        alert(`预约成功：${foodName}【${selectTime}】`);
+        await loadData();
+    }
+}
 
-    slots.forEach((t, i) => {
-        const num = count[t];
-        const w = Math.min(num, 100);
-        document.getElementById("p" + (i + 1)).style.width = w + "%";
-        document.getElementById("s" + (i + 1)).innerText = num + " 人";
-
-        const bar = document.getElementById("p" + (i + 1));
-        if (num < 40) {
-            bar.className = "progress-bar low";
-        } else if (num < 70) {
-            bar.className = "progress-bar medium";
-        } else {
-            bar.className = "progress-bar high";
-        }
-    });
+// 渲染页面
+function renderPage(){
+    const arr = ["11:30-12:00","12:00-12:30","12:30-13:00","13:00-13:30"]
+    arr.forEach((t,i)=>{
+        let num = count[t]||0;
+        let per = Math.min(num,100);
+        document.getElementById("p"+(i+1)).style.width = per+"%";
+        document.getElementById("s"+(i+1)).innerText = num+" 人";
+        let bar = document.getElementById("p"+(i+1));
+        if(num<40) bar.className="progress-bar low";
+        else if(num<70) bar.className="progress-bar medium";
+        else bar.className="progress-bar high";
+    })
 }
 </script>
-
 </body>
 </html>
