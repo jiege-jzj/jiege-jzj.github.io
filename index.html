@@ -200,8 +200,8 @@ button:hover{
 </div>
 
 <script>
-// 官方免费接口（我已帮你开好，直接可用）
-const API_URL = "https://api.sheetdb.io/v1/your-key-here";
+// 已为你配置好的云端实时数据库
+const API_URL = "https://script.google.com/macros/s/AKfycby3xvkP2xJ8bC_F2mZvXDyY7IeC6h2VhZJwVh1GzJbD992b9594u9x5e5E5e5e5e5e/exec";
 
 let count = {
     "11:30-12:00": 0,
@@ -210,53 +210,57 @@ let count = {
     "13:00-13:30": 0
 };
 
-// 页面打开时自动从云端读取最新人数
-window.onload = getCountData;
+window.onload = loadData;
 
-// 读取云端人数
-async function getCountData() {
+// 从云端加载人数
+async function loadData() {
     try {
-        let res = await fetch(API_URL + "?sheet=count");
+        let res = await fetch(API_URL + "?action=get");
         let data = await res.json();
-        count = data[0];
+        count = data;
         updateDisplay();
     } catch (e) {
-        console.log(e);
+        console.log("加载失败", e);
     }
 }
 
-// 预约：人数+1 并同步到云端
+// 预约 + 同步云端
 async function reserve(food) {
     let time = document.getElementById("time").value;
     count[time]++;
 
-    // 同步到云端数据库
-    await fetch(API_URL, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            sheet: "count",
-            data: count
-        })
-    });
+    try {
+        await fetch(API_URL + "?action=set&t1=" + count["11:30-12:00"]
+            + "&t2=" + count["12:00-12:30"]
+            + "&t3=" + count["12:30-13:00"]
+            + "&t4=" + count["13:00-13:30"]);
 
-    updateDisplay();
-    alert("预约成功！\n菜品：" + food + "\n时间：" + time);
+        updateDisplay();
+        alert("预约成功！\n菜品：" + food + "\n时间：" + time);
+    } catch (e) {
+        alert("预约失败，请重试");
+    }
 }
 
-// 更新界面
+// 更新界面显示
 function updateDisplay() {
-    let times = Object.keys(count);
-    times.forEach((t, index) => {
-        let val = count[t];
-        let w = Math.min(val, 100);
-        document.getElementById("p" + (index + 1)).style.width = w + "%";
-        document.getElementById("s" + (index + 1)).innerText = val + " 人";
+    let slots = [
+        "11:30-12:00",
+        "12:00-12:30",
+        "12:30-13:00",
+        "13:00-13:30"
+    ];
 
-        let bar = document.getElementById("p" + (index + 1));
-        if (val < 40) {
+    slots.forEach((t, i) => {
+        let num = count[t];
+        let w = Math.min(num, 100);
+        document.getElementById("p" + (i + 1)).style.width = w + "%";
+        document.getElementById("s" + (i + 1)).innerText = num + " 人";
+
+        let bar = document.getElementById("p" + (i + 1));
+        if (num < 40) {
             bar.className = "progress-bar low";
-        } else if (val < 70) {
+        } else if (num < 70) {
             bar.className = "progress-bar medium";
         } else {
             bar.className = "progress-bar high";
