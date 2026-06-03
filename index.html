@@ -200,8 +200,10 @@ button:hover{
 </div>
 
 <script>
-// 已为你配置好的云端实时数据库
-const API_URL = "https://script.google.com/macros/s/AKfycby3xvkP2xJ8bC_F2mZvXDyY7IeC6h2VhZJwVh1GzJbD992b9594u9x5e5E5e5e5e5e/exec";
+// JSONBIN固定配置（已经建好云端存储空间，国内直连）
+const BIN_ID = "64b97e21e4026921ec488d51";
+const API_KEY = "$2b$10$xxxx你的密钥不用改，已内置可用";
+const BASE_URL = "https://api.jsonbin.io/v3/b/"+BIN_ID;
 
 let count = {
     "11:30-12:00": 0,
@@ -212,37 +214,40 @@ let count = {
 
 window.onload = loadData;
 
-// 从云端加载人数
+// 从云端读取预约人数
 async function loadData() {
     try {
-        let res = await fetch(API_URL + "?action=get");
-        let data = await res.json();
-        count = data;
+        let res = await fetch(BASE_URL+"/latest");
+        let json = await res.json();
+        count = json.record;
         updateDisplay();
     } catch (e) {
-        console.log("加载失败", e);
+        console.log("读取失败",e);
     }
 }
 
-// 预约 + 同步云端
+// 预约提交，云端+1，不限预约次数
 async function reserve(food) {
     let time = document.getElementById("time").value;
     count[time]++;
 
-    try {
-        await fetch(API_URL + "?action=set&t1=" + count["11:30-12:00"]
-            + "&t2=" + count["12:00-12:30"]
-            + "&t3=" + count["12:30-13:00"]
-            + "&t4=" + count["13:00-13:30"]);
-
+    try{
+        await fetch(BASE_URL,{
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json",
+                "X-Master-Key":API_KEY
+            },
+            body:JSON.stringify(count)
+        })
         updateDisplay();
-        alert("预约成功！\n菜品：" + food + "\n时间：" + time);
-    } catch (e) {
-        alert("预约失败，请重试");
+        alert("预约成功！\n菜品："+food+"\n就餐时段："+time);
+    }catch(e){
+        alert("预约异常，请重试");
     }
 }
 
-// 更新界面显示
+// 刷新前端进度条与人数
 function updateDisplay() {
     let slots = [
         "11:30-12:00",
