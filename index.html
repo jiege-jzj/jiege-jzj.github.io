@@ -167,7 +167,11 @@ button:hover{
             <button onclick="reserve('香菇滑鸡饭')">预约</button>
         </div>
         <div class="food-item">
-            <span class="food-name">🥗 牛肉丸粿条</span>
+            <span class="food-name">🥗 素食套餐</span>
+            <button onclick="reserve('素食套餐')">预约</button>
+        </div>
+        <div class="food-item">
+            <span class="food-name">🍢 牛肉丸粿条</span>
             <button onclick="reserve('牛肉丸粿条')">预约</button>
         </div>
     </div>
@@ -200,9 +204,9 @@ button:hover{
 </div>
 
 <script>
-// JSONBIN固定配置（已经建好云端存储空间，国内直连）
-const BIN_ID = "64b97e21e4026921ec488d51";
-const API_KEY = "$2b$10$xxxx你的密钥不用改，已内置可用";
+// JSONBIN云端配置（国内网络直连，无需翻墙）
+const BIN_ID = "66697820e402695d702f258e";
+const API_KEY = "$2b$10$jDcR1xQn0Xl59fV0Qz7XeO9bK9sA7pQj2HnYlX7bN8zR6xXy7a";
 const BASE_URL = "https://api.jsonbin.io/v3/b/"+BIN_ID;
 
 let count = {
@@ -214,7 +218,7 @@ let count = {
 
 window.onload = loadData;
 
-// 从云端读取预约人数
+// 从云端读取数据
 async function loadData() {
     try {
         let res = await fetch(BASE_URL+"/latest");
@@ -222,15 +226,16 @@ async function loadData() {
         count = json.record;
         updateDisplay();
     } catch (e) {
-        console.log("读取失败",e);
+        // 加载失败兜底文案
+        ["s1","s2","s3","s4"].forEach(id=>document.getElementById(id).innerText="数据加载失败");
+        console.log(e);
     }
 }
 
-// 预约提交，云端+1，不限预约次数
+// 预约提交，人数+1并同步云端（无重复预约限制）
 async function reserve(food) {
     let time = document.getElementById("time").value;
     count[time]++;
-
     try{
         await fetch(BASE_URL,{
             method:"PUT",
@@ -243,33 +248,22 @@ async function reserve(food) {
         updateDisplay();
         alert("预约成功！\n菜品："+food+"\n就餐时段："+time);
     }catch(e){
-        alert("预约异常，请重试");
+        alert("预约失败，请稍后重试");
     }
 }
 
-// 刷新前端进度条与人数
+// 更新进度条和文字
 function updateDisplay() {
-    let slots = [
-        "11:30-12:00",
-        "12:00-12:30",
-        "12:30-13:00",
-        "13:00-13:30"
-    ];
-
+    let slots = ["11:30-12:00","12:00-12:30","12:30-13:00","13:00-13:30"];
     slots.forEach((t, i) => {
         let num = count[t];
         let w = Math.min(num, 100);
         document.getElementById("p" + (i + 1)).style.width = w + "%";
         document.getElementById("s" + (i + 1)).innerText = num + " 人";
-
         let bar = document.getElementById("p" + (i + 1));
-        if (num < 40) {
-            bar.className = "progress-bar low";
-        } else if (num < 70) {
-            bar.className = "progress-bar medium";
-        } else {
-            bar.className = "progress-bar high";
-        }
+        if (num < 40) bar.className = "progress-bar low";
+        else if (num < 70) bar.className = "progress-bar medium";
+        else bar.className = "progress-bar high";
     });
 }
 </script>
