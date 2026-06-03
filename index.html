@@ -48,23 +48,23 @@ h2{
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 12px;
-    margin-top: 10px;
+    margin-top:10px;
 }
 
 .food-item{
     background:#f8f9fb;
     border-radius:10px;
-    padding: 12px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
+    padding:12px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    align-items:center;
 }
 
 .food-name{
-    font-size: 14px;
-    color: #333;
+    font-size:14px;
+    color:#333;
 }
 
 button{
@@ -74,10 +74,8 @@ button{
     padding:6px 12px;
     border-radius:6px;
     cursor:pointer;
-    font-size: 13px;
-    transition: 0.2s;
+    font-size:13px;
 }
-
 button:hover{
     background:#219150;
 }
@@ -88,7 +86,6 @@ button:hover{
     margin-top:10px;
     border:1px solid #ddd;
     border-radius:6px;
-    font-size: 14px;
 }
 
 .progress{
@@ -99,35 +96,25 @@ button:hover{
     overflow:hidden;
     margin-top:8px;
 }
-
 .progress-bar{
     height:100%;
-    background:#3498db;
-    transition: width 0.3s ease;
+    transition:width 0.3s;
 }
-
-.high{
-    background:#e74c3c;
-}
-.medium{
-    background:#f39c12;
-}
-.low{
-    background:#2ecc71;
-}
+.low{background:#2ecc71;}
+.medium{background:#f39c12;}
+.high{background:#e74c3c;}
 
 .status{
     margin-top:5px;
     font-size:14px;
     color:#666;
 }
-
 .time-slot{
-    margin-bottom: 18px;
+    margin-bottom:18px;
 }
 </style>
-</head>
 
+</head>
 <body>
 
 <div class="container">
@@ -203,11 +190,13 @@ button:hover{
 
 </div>
 
+<!-- 腾讯云开发 SDK -->
+<script src="https://img.yzcdn.cn/v2/cloudbase-wx2.5.0.js"></script>
+
 <script>
-// JSONBIN云端配置（国内网络直连，无需翻墙）
-const BIN_ID = "66697820e402695d702f258e";
-const API_KEY = "$2b$10$jDcR1xQn0Xl59fV0Qz7XeO9bK9sA7pQj2HnYlX7bN8zR6xXy7a";
-const BASE_URL = "https://api.jsonbin.io/v3/b/"+BIN_ID;
+// 已填入你的环境ID
+const envId = "jiege-d1grl5fwcdb75e719";
+const app = cloudbase.init({ env: envId });
 
 let count = {
     "11:30-12:00": 0,
@@ -216,51 +205,54 @@ let count = {
     "13:00-13:30": 0
 };
 
-window.onload = loadData;
+// 页面打开自动加载云端数据
+window.onload = async () => {
+    await app.auth().anonymousAuthProvider().signIn();
+    loadCount();
+};
 
-// 从云端读取数据
-async function loadData() {
-    try {
-        let res = await fetch(BASE_URL+"/latest");
-        let json = await res.json();
-        count = json.record;
-        updateDisplay();
-    } catch (e) {
-        // 加载失败兜底文案
-        ["s1","s2","s3","s4"].forEach(id=>document.getElementById(id).innerText="数据加载失败");
-        console.log(e);
+// 从云端读取人数
+async function loadCount() {
+    const db = app.database();
+    const res = await db.collection("reserve_count").doc("main").get();
+    
+    if (res.data) {
+        count = res.data;
+    } else {
+        // 初始化数据
+        await db.collection("reserve_count").doc("main").set(count);
     }
+    updateDisplay();
 }
 
-// 预约提交，人数+1并同步云端（无重复预约限制）
+// 预约：人数+1并保存云端
 async function reserve(food) {
-    let time = document.getElementById("time").value;
+    const time = document.getElementById("time").value;
     count[time]++;
-    try{
-        await fetch(BASE_URL,{
-            method:"PUT",
-            headers:{
-                "Content-Type":"application/json",
-                "X-Master-Key":API_KEY
-            },
-            body:JSON.stringify(count)
-        })
-        updateDisplay();
-        alert("预约成功！\n菜品："+food+"\n就餐时段："+time);
-    }catch(e){
-        alert("预约失败，请稍后重试");
-    }
+
+    const db = app.database();
+    await db.collection("reserve_count").doc("main").update(count);
+    
+    updateDisplay();
+    alert("预约成功！\n菜品：" + food + "\n时间：" + time);
 }
 
-// 更新进度条和文字
+// 更新界面
 function updateDisplay() {
-    let slots = ["11:30-12:00","12:00-12:30","12:30-13:00","13:00-13:30"];
+    const slots = [
+        "11:30-12:00",
+        "12:00-12:30",
+        "12:30-13:00",
+        "13:00-13:30"
+    ];
+
     slots.forEach((t, i) => {
-        let num = count[t];
-        let w = Math.min(num, 100);
+        const num = count[t];
+        const w = Math.min(num, 100);
         document.getElementById("p" + (i + 1)).style.width = w + "%";
         document.getElementById("s" + (i + 1)).innerText = num + " 人";
-        let bar = document.getElementById("p" + (i + 1));
+
+        const bar = document.getElementById("p" + (i + 1));
         if (num < 40) bar.className = "progress-bar low";
         else if (num < 70) bar.className = "progress-bar medium";
         else bar.className = "progress-bar high";
