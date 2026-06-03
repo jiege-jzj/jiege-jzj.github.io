@@ -27,6 +27,13 @@ h1{
     text-align:center;
     color:#2c3e50;
     margin-bottom:20px;
+    font-size: 24px;
+}
+
+h2{
+    font-size: 18px;
+    color: #2c3e50;
+    margin-bottom: 15px;
 }
 
 .card{
@@ -37,23 +44,39 @@ h1{
     box-shadow:0 2px 10px rgba(0,0,0,0.08);
 }
 
+/* 菜品网格布局（一行多个） */
+.food-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+
 .food-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin:15px 0;
-    padding:15px;
     background:#f8f9fb;
     border-radius:10px;
+    padding: 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.food-name{
+    font-size: 14px;
+    color: #333;
 }
 
 button{
     background:#27ae60;
     color:white;
     border:none;
-    padding:8px 16px;
+    padding:6px 12px;
     border-radius:6px;
     cursor:pointer;
+    font-size: 13px;
+    transition: 0.2s;
 }
 
 button:hover{
@@ -66,6 +89,7 @@ button:hover{
     margin-top:10px;
     border:1px solid #ddd;
     border-radius:6px;
+    font-size: 14px;
 }
 
 .progress{
@@ -80,6 +104,7 @@ button:hover{
 .progress-bar{
     height:100%;
     background:#3498db;
+    transition: width 0.3s ease;
 }
 
 .high{
@@ -99,6 +124,10 @@ button:hover{
     font-size:14px;
     color:#666;
 }
+
+.time-slot{
+    margin-bottom: 18px;
+}
 </style>
 </head>
 
@@ -109,101 +138,104 @@ button:hover{
 <h1>🍱 智慧饭堂预约系统</h1>
 
 <div class="card">
-<h2>选择就餐时间</h2>
-
-<select id="time" class="time-select">
-<option>11:30-12:00</option>
-<option>12:00-12:30</option>
-<option>12:30-13:00</option>
-<option>13:00-13:30</option>
-</select>
+    <h2>选择就餐时间</h2>
+    <select id="time" class="time-select">
+        <option>11:30-12:00</option>
+        <option>12:00-12:30</option>
+        <option>12:30-13:00</option>
+        <option>13:00-13:30</option>
+    </select>
 </div>
 
 <div class="card">
-<h2>今日菜品</h2>
+    <h2>今日菜品</h2>
+    <div class="food-grid">
+        <div class="food-item">
+            <span class="food-name">🍗 黄焖鸡米饭</span>
+            <button onclick="reserve('黄焖鸡米饭')">预约</button>
+        </div>
 
-<div class="food-item">
-<span>🍗 黄焖鸡米饭</span>
-<button onclick="reserve('黄焖鸡米饭')">预约</button>
-</div>
+        <div class="food-item">
+            <span class="food-name">🥩 红烧排骨饭</span>
+            <button onclick="reserve('红烧排骨饭')">预约</button>
+        </div>
 
-<div class="food-item">
-<span>🥩 红烧排骨饭</span>
-<button onclick="reserve('红烧排骨饭')">预约</button>
-</div>
+        <div class="food-item">
+            <span class="food-name">🍜 牛肉面</span>
+            <button onclick="reserve('牛肉面')">预约</button>
+        </div>
 
-<div class="food-item">
-<span>🍜 牛肉面</span>
-<button onclick="reserve('牛肉面')">预约</button>
-</div>
+        <div class="food-item">
+            <span class="food-name">🍛 咖喱鸡饭</span>
+            <button onclick="reserve('咖喱鸡饭')">预约</button>
+        </div>
 
-<div class="food-item">
-<span>🍛 咖喱鸡饭</span>
-<button onclick="reserve('咖喱鸡饭')">预约</button>
-</div>
+        <div class="food-item">
+            <span class="food-name">🍚 香菇滑鸡饭</span>
+            <button onclick="reserve('香菇滑鸡饭')">预约</button>
+        </div>
 
+        <div class="food-item">
+            <span class="food-name">🥗 素食套餐</span>
+            <button onclick="reserve('素食套餐')">预约</button>
+        </div>
+    </div>
 </div>
 
 <div class="card">
-<h2>各时间段预约人数</h2>
+    <h2>各时间段预约人数</h2>
 
-<div>
-11:30-12:00
-<div class="progress">
-<div id="p1" class="progress-bar low" style="width:20%"></div>
-</div>
-<div class="status" id="s1">20人（推荐）</div>
-</div>
+    <div class="time-slot">
+        11:30-12:00
+        <div class="progress">
+            <div id="p1" class="progress-bar low" style="width:0%"></div>
+        </div>
+        <div class="status" id="s1">0人（推荐）</div>
+    </div>
 
-<br>
+    <div class="time-slot">
+        12:00-12:30
+        <div class="progress">
+            <div id="p2" class="progress-bar low" style="width:0%"></div>
+        </div>
+        <div class="status" id="s2">0人（推荐）</div>
+    </div>
 
-<div>
-12:00-12:30
-<div class="progress">
-<div id="p2" class="progress-bar medium" style="width:55%"></div>
-</div>
-<div class="status" id="s2">55人（较拥挤）</div>
-</div>
+    <div class="time-slot">
+        12:30-13:00
+        <div class="progress">
+            <div id="p3" class="progress-bar low" style="width:0%"></div>
+        </div>
+        <div class="status" id="s3">0人（推荐）</div>
+    </div>
 
-<br>
-
-<div>
-12:30-13:00
-<div class="progress">
-<div id="p3" class="progress-bar high" style="width:90%"></div>
-</div>
-<div class="status" id="s3">90人（高峰期）</div>
-</div>
-
-<br>
-
-<div>
-13:00-13:30
-<div class="progress">
-<div id="p4" class="progress-bar low" style="width:35%"></div>
-</div>
-<div class="status" id="s4">35人（推荐）</div>
-</div>
+    <div class="time-slot">
+        13:00-13:30
+        <div class="progress">
+            <div id="p4" class="progress-bar low" style="width:0%"></div>
+        </div>
+        <div class="status" id="s4">0人（推荐）</div>
+    </div>
 
 </div>
 
 </div>
 
 <script>
-
+// 初始人数全部为 0
 let count = {
-    "11:30-12:00":20,
-    "12:00-12:30":55,
-    "12:30-13:00":90,
-    "13:00-13:30":35
+    "11:30-12:00": 0,
+    "12:00-12:30": 0,
+    "12:30-13:00": 0,
+    "13:00-13:30": 0
 };
 
 function reserve(food){
-
+    // 获取选中的时间段
     let time = document.getElementById("time").value;
-
+    // 对应时间段 +1
     count[time]++;
-
+    // 更新界面显示
     updateDisplay();
 
     alert(
@@ -213,36 +245,30 @@ function reserve(food){
 }
 
 function updateDisplay(){
-
     let times = Object.keys(count);
 
     times.forEach((t,index)=>{
-
         let value = count[t];
-
         let bar = document.getElementById("p"+(index+1));
         let text = document.getElementById("s"+(index+1));
 
-        let width = Math.min(value,100);
+        // 进度条最大100%
+        let width = Math.min(value, 100);
+        bar.style.width = width + "%";
 
-        bar.style.width = width+"%";
-
-        if(value<40){
-            bar.className="progress-bar low";
-            text.innerHTML=value+"人（推荐）";
+        // 根据人数显示状态
+        if(value < 40){
+            bar.className = "progress-bar low";
+            text.innerHTML = value + "人（推荐）";
+        } else if(value < 70){
+            bar.className = "progress-bar medium";
+            text.innerHTML = value + "人（较拥挤）";
+        } else {
+            bar.className = "progress-bar high";
+            text.innerHTML = value + "人（高峰期）";
         }
-        else if(value<70){
-            bar.className="progress-bar medium";
-            text.innerHTML=value+"人（较拥挤）";
-        }
-        else{
-            bar.className="progress-bar high";
-            text.innerHTML=value+"人（高峰期）";
-        }
-
     });
 }
-
 </script>
 
 </body>
