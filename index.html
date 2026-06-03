@@ -27,13 +27,13 @@ h1{
     text-align:center;
     color:#2c3e50;
     margin-bottom:20px;
-    font-size: 24px;
+    font-size:24px;
 }
 
 h2{
-    font-size: 18px;
-    color: #2c3e50;
-    margin-bottom: 15px;
+    font-size:18px;
+    color:#2c3e50;
+    margin-bottom:15px;
 }
 
 .card{
@@ -45,9 +45,9 @@ h2{
 }
 
 .food-grid{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:12px;
     margin-top:10px;
 }
 
@@ -76,6 +76,7 @@ button{
     cursor:pointer;
     font-size:13px;
 }
+
 button:hover{
     background:#219150;
 }
@@ -96,10 +97,12 @@ button:hover{
     overflow:hidden;
     margin-top:8px;
 }
+
 .progress-bar{
     height:100%;
     transition:width 0.3s;
 }
+
 .low{background:#2ecc71;}
 .medium{background:#f39c12;}
 .high{background:#e74c3c;}
@@ -109,12 +112,13 @@ button:hover{
     font-size:14px;
     color:#666;
 }
+
 .time-slot{
     margin-bottom:18px;
 }
 </style>
-
 </head>
+
 <body>
 
 <div class="container">
@@ -190,13 +194,12 @@ button:hover{
 
 </div>
 
-<!-- 腾讯云开发 SDK -->
-<script src="https://img.yzcdn.cn/v2/cloudbase-wx2.5.0.js"></script>
+<script src="https://web-sdk-1253687890.cos.ap-beijing.myqcloud.com/cloudbase.js"></script>
 
 <script>
-// 已填入你的环境ID
-const envId = "jiege-d1grl5fwcdb75e719";
-const app = cloudbase.init({ env: envId });
+const app = cloudbase.init({
+    env: "jiege-d1grl5fwcdb75e719"
+});
 
 let count = {
     "11:30-12:00": 0,
@@ -205,27 +208,28 @@ let count = {
     "13:00-13:30": 0
 };
 
-// 页面打开自动加载云端数据
-window.onload = async () => {
-    await app.auth().anonymousAuthProvider().signIn();
-    loadCount();
+window.onload = async function () {
+    try {
+        await app.auth().anonymousAuthProvider().signIn();
+        loadData();
+    } catch (e) {
+        console.log("加载失败", e);
+    }
 };
 
-// 从云端读取人数
-async function loadCount() {
+async function loadData() {
     const db = app.database();
-    const res = await db.collection("reserve_count").doc("main").get();
-    
+    const coll = db.collection("reserve_count");
+    const res = await coll.doc("main").get();
+
     if (res.data) {
         count = res.data;
     } else {
-        // 初始化数据
-        await db.collection("reserve_count").doc("main").set(count);
+        await coll.doc("main").set(count);
     }
     updateDisplay();
 }
 
-// 预约：人数+1并保存云端
 async function reserve(food) {
     const time = document.getElementById("time").value;
     count[time]++;
@@ -237,7 +241,6 @@ async function reserve(food) {
     alert("预约成功！\n菜品：" + food + "\n时间：" + time);
 }
 
-// 更新界面
 function updateDisplay() {
     const slots = [
         "11:30-12:00",
@@ -253,9 +256,13 @@ function updateDisplay() {
         document.getElementById("s" + (i + 1)).innerText = num + " 人";
 
         const bar = document.getElementById("p" + (i + 1));
-        if (num < 40) bar.className = "progress-bar low";
-        else if (num < 70) bar.className = "progress-bar medium";
-        else bar.className = "progress-bar high";
+        if (num < 40) {
+            bar.className = "progress-bar low";
+        } else if (num < 70) {
+            bar.className = "progress-bar medium";
+        } else {
+            bar.className = "progress-bar high";
+        }
     });
 }
 </script>
