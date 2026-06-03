@@ -51,68 +51,65 @@ button:hover{background:#219150;}
     </div>
 </div>
 <div class="card">
-    <h2>各时间段预约人数</h2>
+    <h2>各时间段预约人数（本机统计）</h2>
     <div class="time-slot">
         11:30-12:00
         <div class="progress"><div id="p1" class="progress-bar low" style="width:0%"></div></div>
-        <div class="status" id="s1">加载中...</div>
+        <div class="status" id="s1">0 人</div>
     </div>
     <div class="time-slot">
         12:00-12:30
         <div class="progress"><div id="p2" class="progress-bar low" style="width:0%"></div></div>
-        <div class="status" id="s2">加载中...</div>
+        <div class="status" id="s2">0 人</div>
     </div>
     <div class="time-slot">
         12:30-13:00
         <div class="progress"><div id="p3" class="progress-bar low" style="width:0%"></div></div>
-        <div class="status" id="s3">加载中...</div>
+        <div class="status" id="s3">0 人</div>
     </div>
     <div class="time-slot">
         13:00-13:30
         <div class="progress"><div id="p4" class="progress-bar low" style="width:0%"></div></div>
-        <div class="status" id="s4">加载中...</div>
+        <div class="status" id="s4">0 人</div>
     </div>
 </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@1.7.1/dist/cloudbase.full.js"></script>
 <script>
-const app = cloudbase.init({env:"jiege-d1grl5fwcdb75e719"});
-let count = {};
-
-window.onload = async function(){
-    await app.auth().anonymousAuthProvider().signIn();
-    await loadData();
-}
-
-// 读取数据
-async function loadData(){
-    let res = await app.callFunction({
-        name:"operateCount",
-        data:{action:"get"}
-    })
-    count = res.result.data;
-    renderPage();
-}
-
-// 预约提交
-async function reserve(foodName){
-    let selectTime = document.getElementById("time").value;
-    let res = await app.callFunction({
-        name:"operateCount",
-        data:{action:"add",timeKey:selectTime}
-    })
-    if(res.result.code===0){
-        alert(`预约成功：${foodName}【${selectTime}】`);
-        await loadData();
+// 从浏览器本地缓存读取数据
+function getCount(){
+    let data = localStorage.getItem("reserveData");
+    if(!data){
+        return {
+            "11:30-12:00":0,
+            "12:00-12:30":0,
+            "12:30-13:00":0,
+            "13:00-13:30":0
+        }
     }
+    return JSON.parse(data);
+}
+// 保存数据到本地
+function saveCount(obj){
+    localStorage.setItem("reserveData",JSON.stringify(obj))
 }
 
-// 渲染页面
-function renderPage(){
+// 预约
+function reserve(foodName){
+    let t = document.getElementById("time").value;
+    let cnt = getCount();
+    cnt[t] +=1;
+    saveCount(cnt);
+    alert(`预约成功：${foodName} ${t}`);
+    render();
+}
+
+// 渲染进度条
+function render(){
     const arr = ["11:30-12:00","12:00-12:30","12:30-13:00","13:00-13:30"]
+    let cnt = getCount();
     arr.forEach((t,i)=>{
-        let num = count[t]||0;
+        let num = cnt[t];
         let per = Math.min(num,100);
         document.getElementById("p"+(i+1)).style.width = per+"%";
         document.getElementById("s"+(i+1)).innerText = num+" 人";
@@ -122,6 +119,8 @@ function renderPage(){
         else bar.className="progress-bar high";
     })
 }
+
+window.onload = render;
 </script>
 </body>
 </html>
